@@ -1,33 +1,26 @@
 import os
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain.chains import RetrievalQA
+from langchain.chains import ConversationalRetrievalChain
 from pinecone import Pinecone as PC
 from langchain_pinecone import Pinecone
-from typing import Any
+from typing import Any, List, Dict
 
 from constants import INDEX_NAME
 
 pc = PC()
 
-def run_llm(query:str) -> Any:
+def run_llm(query:str, chat_history: List[Dict[str, Any]] = []) -> Any:
     embeddings = OpenAIEmbeddings()
     docsearch = Pinecone.from_existing_index(index_name=INDEX_NAME, embedding=embeddings)
     chat = ChatOpenAI(verbose=True, temperature=0)
 
-    qa = RetrievalQA.from_chain_type(
+    qa = ConversationalRetrievalChain.from_llm(
         llm=chat, 
-        chain_type="stuff", 
         retriever=docsearch.as_retriever(),
         return_source_documents=True
     )
 
-    # print("######################")
-    # docs = docsearch.similarity_search(query)
-    # for d in docs:
-    #     print(d.page_content)
-    #     print("######################")
-    # print("######################")
-    return qa({"query": query})
+    return qa({"question": query, "chat_history": chat_history})
 
 
 if __name__ == "__main__":
