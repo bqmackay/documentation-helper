@@ -3,7 +3,7 @@ import streamlit as st
 from streamlit_chat import message
 from typing import Set
 
-st.header("LangChain Udemy Course!!")
+st.header("LangChain Documentation Chat")
 
 prompt = st.text_input("Prompt", placeholder="Enter your prompt here...")
 
